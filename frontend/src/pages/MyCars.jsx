@@ -1,144 +1,117 @@
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
+import api, { API_BASE_URL } from "../api/api"
 
-import { Link } from "react-router-dom"
-
-import { AuthContext } from "../context/AuthContext"
-
-import {
-  getCars,
-  deleteCar
-} from "../services/carService"
-
-export default function MyCars() {
-
-  const { user } = useContext(AuthContext)
-
+const MyCars = ({ user }) => {
   const [cars, setCars] = useState([])
 
-  useEffect(() => {
-    fetchMyCars()
-  }, [])
+  const getCarImage = (car) => {
+    if (car.images && car.images.length > 0) {
+      return `${API_BASE_URL}${car.images[0]}`
+    }
 
-  const fetchMyCars = async () => {
+    if (car.image) {
+      if (car.image.startsWith("http")) return car.image
+      return `${API_BASE_URL}${car.image}`
+    }
+
+    return "/cars/default-car.png"
+  }
+
+  const isMyCar = (car) => {
+    return (
+      car.seller?._id === user?._id ||
+      car.seller === user?._id ||
+      car.user === user?._id ||
+      car.owner === user?._id
+    )
+  }
+
+  const getMyCars = async () => {
     try {
-      const data = await getCars()
-
-      const myCars = data.filter(
-        (car) =>
-          car.owner?._id === user?._id
-      )
-
-      setCars(myCars)
-
+      const res = await api.get("/cars")
+      const filteredCars = res.data.filter((car) => isMyCar(car))
+      setCars(filteredCars)
     } catch (error) {
       console.log(error)
     }
   }
 
-  const handleDelete = async (id) => {
+  const deleteCar = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this car?")
+    if (!confirmDelete) return
+
     try {
-      await deleteCar(id)
-
-      setCars(
-        cars.filter(
-          (car) => car._id !== id
-        )
-      )
-
+      await api.delete(`/cars/${id}`)
+      getMyCars()
     } catch (error) {
-      console.log(error)
+      console.log(error.response?.data)
+      alert("Delete failed")
     }
+  }
+
+  const updateStatus = async (id, status) => {
+    try {
+      await api.put(`/cars/${id}`, { status })
+      getMyCars()
+    } catch (error) {
+      console.log(error.response?.data)
+      alert("Update failed")
+    }
+  }
+
+  useEffect(() => {
+    if (user) getMyCars()
+  }, [user])
+
+  if (!user) {
+    return (
+      <main className="page">
+        <h1>My Posts</h1>
+        <p>You need to sign in first.</p>
+      </main>
+    )
   }
 
   return (
-    <div className="p-6">
+    <main className="page">
+      <h1>My Posts</h1>
 
-      <div className="flex justify-between items-center mb-6">
-
-        <h1 className="text-3xl font-bold">
-          My Cars
-        </h1>
-
-        <Link
-          to="/add-car"
-          className="bg-black text-white px-5 py-2 rounded"
-        >
-          Add New Car
-        </Link>
-
-      </div>
-
-      {cars.length === 0 ? (
-
-        <p>You have no cars yet</p>
-
-      ) : (
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-          {cars.map((car) => (
-
-            <div
-              key={car._id}
-              className="border rounded-2xl p-4 shadow bg-white"
-            >
-
-              <img
-                src={
-                  car.images?.[0] ||
-                  "https://via.placeholder.com/400x250"
-                }
-                alt={car.title}
-                className="w-full h-52 object-cover rounded-xl"
-              />
-
-              <h2 className="text-2xl font-bold mt-4">
-                {car.title}
-              </h2>
-
-              <p className="mt-2">
-                {car.price} BHD
-              </p>
-
-              <p className="mt-1 text-gray-600">
-                {car.location}
-              </p>
-
-              <div className="flex gap-2 mt-4">
-
-                <Link
-                  to={`/cars/${car._id}`}
-                  className="bg-black text-white px-4 py-2 rounded"
-                >
-                  Details
-                </Link>
-
-                <Link
-                  to={`/edit-car/${car._id}`}
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                  Edit
-                </Link>
-
-                <button
-                  onClick={() =>
-                    handleDelete(car._id)
-                  }
-                  className="bg-red-500 text-white px-4 py-2 rounded"
-                >
-                  Delete
-                </button>
-
-              </div>
-
+      <div className="cars-grid">
+        {cars.map((car) => (
+          <div className="car-card" key={car._id}>
+            <div className="car-img-box">
+              <img src={getCarImage(car)} alt={car.title} />
             </div>
 
-          ))}
+            <div className="car-card-content">
+              <h3>{car.title}</h3>
+              <p>{car.brand} - {car.category}</p>
+              <p>{car.year}</p>
+              <p>{car.price} BD</p>
+              <p>{car.mileage || 0} KM</p>
+              <p>Status: {car.status || "Available"}</p>
 
-        </div>
+              <div className="post-actions">
+                <button onClick={() => updateStatus(car._id, "Sold")}>
+                  Mark Sold
+                </button>
 
-      )}
+                <button onClick={() => updateStatus(car._id, "Available")}>
+                  Available
+                </button>
 
-    </div>
+                <button onClick={() => deleteCar(car._id)}>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {cars.length === 0 && <p>You have no cars yet.</p>}
+    </main>
   )
 }
+
+export default MyCars

@@ -1,21 +1,11 @@
-import { useContext, useState } from "react"
+import { useState } from "react"
+import api from "../api/api"
 
-import { loginUser } from "../services/authService"
-
-import { AuthContext } from "../context/AuthContext"
-
-import { useNavigate } from "react-router-dom"
-
-export default function Login() {
-
+const Login = ({ setPage, setUser }) => {
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   })
-
-  const { login } = useContext(AuthContext)
-
-  const navigate = useNavigate()
 
   const handleChange = (e) => {
     setFormData({
@@ -28,46 +18,51 @@ export default function Login() {
     e.preventDefault()
 
     try {
-      const data = await loginUser(formData)
+      const res = await api.post("/auth/login", formData)
 
-      login(data.user, data.token)
+      localStorage.setItem("carooToken", res.data.token)
+      localStorage.setItem("carooUser", JSON.stringify(res.data.user))
 
-      navigate("/")
+      setUser(res.data.user)
+      setPage("home")
     } catch (error) {
       console.log(error)
+      alert("Login failed")
     }
   }
 
   return (
-    <div className="flex justify-center mt-10">
-      <form
-        onSubmit={handleSubmit}
-        className="w-[400px] border p-6 rounded-xl"
-      >
-        <h1 className="text-2xl font-bold mb-4">
-          Login
-        </h1>
+    <main className="auth-page">
+      <div className="auth-card">
+        <h1>Welcome Back</h1>
+        <p>Sign in to manage your cars.</p>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          className="border p-2 w-full mb-4"
-          onChange={handleChange}
-        />
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+          />
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          className="border p-2 w-full mb-4"
-          onChange={handleChange}
-        />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+          />
 
-        <button className="bg-black text-white w-full py-2 rounded">
-          Login
-        </button>
-      </form>
-    </div>
+          <button type="submit">Sign In</button>
+        </form>
+
+        <span onClick={() => setPage("register")}>
+          Don't have an account? Register
+        </span>
+      </div>
+    </main>
   )
 }
+
+export default Login

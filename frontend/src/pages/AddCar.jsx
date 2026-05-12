@@ -1,19 +1,41 @@
 import { useState } from "react"
-import { createCar } from "../services/carService"
-import { useNavigate } from "react-router-dom"
+import api from "../api/api"
 
-export default function AddCar() {
+const brands = [
+  "Lexus",
+  "Nissan",
+  "Toyota",
+  "BMW",
+  "Mercedes",
+  "Porsche",
+  "Ford",
+  "Kia",
+  "Volkswagen",
+  "Chevrolet",
+  "Honda",
+  "Hyundai",
+  "Audi",
+  "Dodge",
+  "Mazda",
+  "Jaguar",
+  "Land Rover"
+]
 
-  const navigate = useNavigate()
+const categories = ["SUV", "Sedan", "Sport", "Pickup", "Luxury", "Electric"]
 
+const AddCar = ({ setPage, user }) => {
   const [formData, setFormData] = useState({
     title: "",
-    model: "",
+    brand: "",
+    category: "",
     year: "",
     price: "",
-    location: "",
-    description: ""
+    mileage: "",
+    description: "",
+    phone: ""
   })
+
+  const [images, setImages] = useState([])
 
   const handleChange = (e) => {
     setFormData({
@@ -22,79 +44,116 @@ export default function AddCar() {
     })
   }
 
+  const handleImages = (e) => {
+    setImages(e.target.files)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    try {
-      await createCar(formData)
+    if (!user) {
+      alert("You must sign in first")
+      setPage("login")
+      return
+    }
 
-      navigate("/")
+    try {
+      const data = new FormData()
+
+      data.append("title", formData.title)
+      data.append("brand", formData.brand)
+      data.append("category", formData.category)
+      data.append("year", formData.year)
+      data.append("price", formData.price)
+      data.append("mileage", formData.mileage)
+      data.append("description", formData.description)
+      data.append("phone", formData.phone)
+      data.append("seller", user._id)
+
+      for (let i = 0; i < images.length; i++) {
+        data.append("images", images[i])
+      }
+
+      await api.post("/cars", data, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      })
+
+      alert("Car added successfully")
+      setPage("myCars")
     } catch (error) {
-      console.log(error)
+      console.log("ERROR RESPONSE:", error.response?.data)
+      alert(error.response?.data?.message || "Error adding car")
     }
   }
 
   return (
-    <div className="flex justify-center mt-10">
-      <form
-        onSubmit={handleSubmit}
-        className="w-[500px] border p-6 rounded-xl"
-      >
-        <h1 className="text-2xl font-bold mb-4">
-          Add Car
-        </h1>
+    <main className="form-page">
+      <button className="back-btn" onClick={() => setPage("home")}>
+        ← Back
+      </button>
 
+      <h1>Add New Car</h1>
+
+      <form className="car-form" onSubmit={handleSubmit}>
         <input
           type="text"
           name="title"
-          placeholder="Title"
-          className="border p-2 w-full mb-4"
+          placeholder="Car title"
+          value={formData.title}
           onChange={handleChange}
+          required
         />
+
+        <select name="brand" value={formData.brand} onChange={handleChange} required>
+          <option value="">Select Brand</option>
+          {brands.map((brand) => (
+            <option key={brand} value={brand}>{brand}</option>
+          ))}
+        </select>
+
+        <select name="category" value={formData.category} onChange={handleChange} required>
+          <option value="">Select Category</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>{category}</option>
+          ))}
+        </select>
+
+        <input type="number" name="year" placeholder="Year" value={formData.year} onChange={handleChange} required />
+        <input type="number" name="price" placeholder="Price BD" value={formData.price} onChange={handleChange} required />
+        <input type="number" name="mileage" placeholder="Mileage" value={formData.mileage} onChange={handleChange} />
 
         <input
           type="text"
-          name="model"
-          placeholder="Model"
-          className="border p-2 w-full mb-4"
+          name="phone"
+          placeholder="Phone number"
+          value={formData.phone}
           onChange={handleChange}
+          required
         />
 
         <input
-          type="number"
-          name="year"
-          placeholder="Year"
-          className="border p-2 w-full mb-4"
-          onChange={handleChange}
-        />
-
-        <input
-          type="number"
-          name="price"
-          placeholder="Price"
-          className="border p-2 w-full mb-4"
-          onChange={handleChange}
-        />
-
-        <input
-          type="text"
-          name="location"
-          placeholder="Location"
-          className="border p-2 w-full mb-4"
-          onChange={handleChange}
+          type="file"
+          name="images"
+          accept="image/*"
+          multiple
+          onChange={handleImages}
         />
 
         <textarea
           name="description"
           placeholder="Description"
-          className="border p-2 w-full mb-4"
+          value={formData.description}
           onChange={handleChange}
-        />
+        ></textarea>
 
-        <button className="bg-black text-white w-full py-2 rounded">
+        <button className="black-btn" type="submit">
           Add Car
         </button>
       </form>
-    </div>
+    </main>
   )
 }
+
+export default AddCar

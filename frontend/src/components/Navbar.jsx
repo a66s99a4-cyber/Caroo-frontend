@@ -1,37 +1,27 @@
-import { Link } from "react-router-dom"
-
-export default function Navbar() {
-
+const Navbar = ({ setPage, user, logout }) => {
   return (
-    <header className="header">
+    <nav className="navbar">
+      <button className="logo-circle" onClick={() => setPage("home")}>
+        C
+      </button>
 
-      <h1 className="logo">
-        Car Market
-      </h1>
+      <ul className="nav-links">
+        <li onClick={() => setPage("allCars")}>All Cars</li>
+        <li onClick={() => setPage("favorites")}>My Favorite</li>
+        <li onClick={() => setPage("myCars")}>My Posts</li>
+        <li onClick={() => setPage("home")}>Brands</li>
 
-      <nav className="nav">
-
-        <Link to="/">
-          Home
-        </Link>
-
-        <Link to="/add-car">
-          Add Car
-        </Link>
-
-        <Link to="/favorites">
-          Favorites
-        </Link>
-
-        <Link
-          to="/login"
-          className="main-btn"
-        >
-          Login
-        </Link>
-
-      </nav>
-
-    </header>
+        {!user ? (
+          <>
+            <li onClick={() => setPage("login")}>Sign In</li>
+            <li onClick={() => setPage("register")}>Register</li>
+          </>
+        ) : (
+          <li onClick={logout}>Logout</li>
+        )}
+      </ul>
+    </nav>
   )
 }
+
+export default Navbar

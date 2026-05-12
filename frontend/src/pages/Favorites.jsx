@@ -1,104 +1,75 @@
 import { useEffect, useState } from "react"
+import api from "../api/api"
+import CarCard from "../components/CarCard"
 
-import { Link } from "react-router-dom"
+const Favorites = () => {
+  const [cars, setCars] = useState([])
+  const [favoriteBrands, setFavoriteBrands] = useState([])
 
-import API from "../api/axios"
+  const getFavorites = async () => {
+    try {
+      const saved = localStorage.getItem("favoriteBrands")
+      const brands = saved ? JSON.parse(saved) : []
 
-export default function Favorites() {
+      setFavoriteBrands(brands)
 
-  const [favorites, setFavorites] = useState([])
+      const res = await api.get("/cars")
+
+      const filteredCars = res.data.filter((car) => {
+        return brands.includes(car.brand)
+      })
+
+      setCars(filteredCars)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const removeBrand = (brandName) => {
+    const updatedFavorites = favoriteBrands.filter((brand) => brand !== brandName)
+
+    localStorage.setItem("favoriteBrands", JSON.stringify(updatedFavorites))
+    setFavoriteBrands(updatedFavorites)
+
+    const updatedCars = cars.filter((car) => car.brand !== brandName)
+    setCars(updatedCars)
+  }
 
   useEffect(() => {
-    fetchFavorites()
+    getFavorites()
   }, [])
 
-  const fetchFavorites = async () => {
-    try {
-      const res = await API.get("/favorites")
-
-      setFavorites(res.data)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const removeFavorite = async (carId) => {
-    try {
-      await API.post(`/favorites/${carId}`)
-
-      setFavorites(
-        favorites.filter(
-          (fav) => fav.car._id !== carId
-        )
-      )
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   return (
-    <div className="p-6">
+    <main className="page">
+      <h1>My Favorite</h1>
 
-      <h1 className="text-3xl font-bold mb-6">
-        My Favorites
-      </h1>
-
-      {favorites.length === 0 ? (
-        <p>No favorites yet</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-          {favorites.map((favorite) => (
-
-            <div
-              key={favorite._id}
-              className="border rounded-2xl p-4 shadow bg-white"
-            >
-
-              <img
-                src={
-                  favorite.car.images?.[0] ||
-                  "https://via.placeholder.com/400x250"
-                }
-                alt={favorite.car.title}
-                className="w-full h-52 object-cover rounded-xl"
-              />
-
-              <h2 className="text-2xl font-bold mt-4">
-                {favorite.car.title}
-              </h2>
-
-              <p className="text-lg mt-2">
-                {favorite.car.price} BHD
-              </p>
-
-              <div className="flex gap-2 mt-4">
-
-                <Link
-                  to={`/cars/${favorite.car._id}`}
-                  className="bg-black text-white px-4 py-2 rounded"
-                >
-                  Details
-                </Link>
-
-                <button
-                  onClick={() =>
-                    removeFavorite(favorite.car._id)
-                  }
-                  className="bg-red-500 text-white px-4 py-2 rounded"
-                >
-                  Remove
-                </button>
-
-              </div>
-
-            </div>
-
+      {favoriteBrands.length > 0 ? (
+        <div className="favorite-brands-list">
+          {favoriteBrands.map((brand) => (
+            <button key={brand} onClick={() => removeBrand(brand)}>
+            ★ {brand} ×
+            </button>
           ))}
-
         </div>
+      ) : (
+        <p className="empty-text">
+          You have no favorite brands yet. Go to Brands and press the heart.
+        </p>
       )}
 
-    </div>
+      <div className="cars-grid">
+        {cars.map((car) => (
+          <CarCard key={car._id} car={car} />
+        ))}
+      </div>
+
+      {favoriteBrands.length > 0 && cars.length === 0 && (
+        <p className="empty-text">
+          No cars found for your favorite brands yet.
+        </p>
+      )}
+    </main>
   )
 }
+
+export default Favorites

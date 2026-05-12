@@ -1,19 +1,16 @@
 import { useState } from "react"
+import api from "../api/api"
 
-import { registerUser } from "../services/authService"
-
-import { useNavigate } from "react-router-dom"
-
-export default function Register() {
-
-  const navigate = useNavigate()
-
+const Register = ({ setPage, setUser }) => {
   const [formData, setFormData] = useState({
+    username: "",
     nameEn: "",
     nameAr: "",
     email: "",
     password: ""
   })
+
+  const [profileImage, setProfileImage] = useState(null)
 
   const handleChange = (e) => {
     setFormData({
@@ -26,60 +23,63 @@ export default function Register() {
     e.preventDefault()
 
     try {
-      await registerUser(formData)
+      const data = new FormData()
 
-      navigate("/login")
+      data.append("username", formData.username)
+      data.append("nameEn", formData.nameEn)
+      data.append("nameAr", formData.nameAr)
+      data.append("email", formData.email)
+      data.append("password", formData.password)
+
+      if (profileImage) {
+        data.append("profileImage", profileImage)
+      }
+
+      const res = await api.post("/auth/register", data, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      })
+
+      localStorage.setItem("carooToken", res.data.token)
+      localStorage.setItem("carooUser", JSON.stringify(res.data.user))
+
+      setUser(res.data.user)
+      setPage("home")
     } catch (error) {
-      console.log(error)
+      console.log(error.response?.data)
+      alert(error.response?.data?.message || "Register failed")
     }
   }
 
   return (
-    <div className="flex justify-center mt-10">
-      <form
-        onSubmit={handleSubmit}
-        className="w-[400px] border p-6 rounded-xl"
-      >
-        <h1 className="text-2xl font-bold mb-4">
-          Register
-        </h1>
+    <main className="auth-page">
+      <div className="auth-card">
+        <h1>Create Account</h1>
+        <p>Join Caroo and start selling cars.</p>
 
-        <input
-          type="text"
-          name="nameEn"
-          placeholder="English Name"
-          className="border p-2 w-full mb-4"
-          onChange={handleChange}
-        />
+        <form onSubmit={handleSubmit}>
+          <input type="text" name="username" placeholder="Username" value={formData.username} onChange={handleChange} required />
+          <input type="text" name="nameEn" placeholder="English Name" value={formData.nameEn} onChange={handleChange} required />
+          <input type="text" name="nameAr" placeholder="Arabic Name" value={formData.nameAr} onChange={handleChange} required />
+          <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
+          <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
 
-        <input
-          type="text"
-          name="nameAr"
-          placeholder="Arabic Name"
-          className="border p-2 w-full mb-4"
-          onChange={handleChange}
-        />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setProfileImage(e.target.files[0])}
+          />
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          className="border p-2 w-full mb-4"
-          onChange={handleChange}
-        />
+          <button type="submit">Register</button>
+        </form>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          className="border p-2 w-full mb-4"
-          onChange={handleChange}
-        />
-
-        <button className="bg-black text-white w-full py-2 rounded">
-          Register
-        </button>
-      </form>
-    </div>
+        <span onClick={() => setPage("login")}>
+          Already have an account? Sign In
+        </span>
+      </div>
+    </main>
   )
 }
+
+export default Register
