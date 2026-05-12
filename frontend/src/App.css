@@ -1774,3 +1774,289 @@ button {
     height: 300px;
   }
 }
+
+.car-details-page {
+  padding: 60px 50px;
+  min-height: 100vh;
+  position: relative;
+}
+
+.car-details-hero {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 34px;
+  padding: 34px;
+  border-radius: 44px;
+  background:
+    radial-gradient(circle at top right, rgba(255,255,255,0.18), transparent 30%),
+    linear-gradient(135deg, #050505, #1b1b1b);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.28);
+  overflow: hidden;
+}
+
+.car-details-image {
+  height: 520px;
+  border-radius: 34px;
+  overflow: hidden;
+  background: #111;
+}
+
+.car-details-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.6s ease;
+}
+
+.car-details-hero:hover .car-details-image img {
+  transform: scale(1.07);
+}
+
+.car-details-info {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.details-tag {
+  width: fit-content;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.1);
+  color: #ddd;
+  font-weight: 900;
+  margin-bottom: 20px;
+}
+
+.car-details-info h1 {
+  font-size: clamp(48px, 6vw, 86px);
+  line-height: 0.92;
+  letter-spacing: -5px;
+  margin-bottom: 18px;
+}
+
+.car-details-info h2 {
+  font-size: 42px;
+  margin-bottom: 25px;
+}
+
+.details-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.details-specs span {
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: white;
+  color: #111;
+  font-weight: 900;
+}
+
+.details-description {
+  color: #d5d5d5;
+  line-height: 1.8;
+  font-size: 17px;
+  margin-bottom: 24px;
+}
+
+.car-interaction-grid {
+  margin-top: 34px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 28px;
+}
+
+.live-chat-box,
+.review-box,
+.report-box {
+  background: rgba(255,255,255,0.9);
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 34px;
+  padding: 28px;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.12);
+}
+
+.report-box {
+  grid-column: span 2;
+  background:
+    radial-gradient(circle at right, rgba(0,0,0,0.1), transparent 35%),
+    linear-gradient(135deg, #ffffff, #f5f5f5);
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: center;
+  gap: 18px;
+}
+
+.live-chat-box h2,
+.review-box h2,
+.report-box h2 {
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  margin-bottom: 8px;
+}
+
+.live-chat-box > p,
+.review-box > p,
+.report-box p {
+  color: #666;
+  font-weight: 700;
+  margin-bottom: 22px;
+}
+
+.chat-messages {
+  height: 340px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 24px;
+  background: #f4f4f4;
+  margin-bottom: 18px;
+}
+
+.chat-bubble {
+  max-width: 78%;
+  background: white;
+  padding: 14px 16px;
+  border-radius: 20px 20px 20px 6px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+}
+
+.chat-bubble.mine {
+  align-self: flex-end;
+  background: #111;
+  color: white;
+  border-radius: 20px 20px 6px 20px;
+}
+
+.chat-bubble strong {
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.chat-bubble p {
+  margin-top: 6px;
+  font-weight: 700;
+}
+
+.empty-chat {
+  color: #777;
+  font-weight: 900;
+  text-align: center;
+  margin: auto;
+}
+
+.chat-form {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 12px;
+}
+
+.chat-form input,
+.review-form select,
+.review-form textarea,
+.report-box select {
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(0,0,0,0.15);
+  outline: none;
+  font-weight: 800;
+  background: white;
+}
+
+.chat-form button,
+.review-form button,
+.report-box button {
+  border: none;
+  background: #050505;
+  color: white;
+  border-radius: 999px;
+  font-weight: 900;
+  padding: 15px 24px;
+  transition: 0.25s ease;
+}
+
+.chat-form button:hover,
+.review-form button:hover,
+.report-box button:hover {
+  transform: translateY(-4px);
+}
+
+.chat-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.avg-rating {
+  font-size: 30px;
+  color: #111 !important;
+}
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.review-form textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.reviews-list {
+  display: grid;
+  gap: 14px;
+}
+
+.review-card {
+  padding: 16px;
+  border-radius: 22px;
+  background: #f4f4f4;
+}
+
+.review-card strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.review-card span {
+  color: #111;
+  font-weight: 900;
+}
+
+.review-card p {
+  margin-top: 8px;
+  color: #555;
+  font-weight: 700;
+}
+
+@media (max-width: 950px) {
+  .car-details-page {
+    padding: 35px 18px;
+  }
+
+  .car-details-hero,
+  .car-interaction-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .car-details-image {
+    height: 330px;
+  }
+
+  .report-box {
+    grid-column: span 1;
+    grid-template-columns: 1fr;
+  }
+
+  .chat-form {
+    grid-template-columns: 1fr;
+  }
+}

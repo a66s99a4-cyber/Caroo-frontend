@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import api from "../api/api"
 import CarCard from "../components/CarCard"
 
-const Favorites = () => {
+const Favorites = ({ setPage, setSelectedCar }) => {
   const [cars, setCars] = useState([])
   const [favoriteBrands, setFavoriteBrands] = useState([])
 
@@ -47,7 +47,7 @@ const Favorites = () => {
         <div className="favorite-brands-list">
           {favoriteBrands.map((brand) => (
             <button key={brand} onClick={() => removeBrand(brand)}>
-            ★ {brand} ×
+              ★ {brand} ×
             </button>
           ))}
         </div>
@@ -59,7 +59,12 @@ const Favorites = () => {
 
       <div className="cars-grid">
         {cars.map((car) => (
-          <CarCard key={car._id} car={car} />
+          <CarCard
+            key={car._id}
+            car={car}
+            setPage={setPage}
+            setSelectedCar={setSelectedCar}
+          />
         ))}
       </div>
 

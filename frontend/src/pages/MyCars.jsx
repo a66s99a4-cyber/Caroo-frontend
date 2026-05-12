@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import api, { API_BASE_URL } from "../api/api"
 
-const MyCars = ({ user }) => {
+const MyCars = ({ user, setPage, setSelectedCar }) => {
   const [cars, setCars] = useState([])
 
   const getCarImage = (car) => {
@@ -15,6 +15,11 @@ const MyCars = ({ user }) => {
     }
 
     return "/cars/default-car.png"
+  }
+
+  const openDetails = (car) => {
+    setSelectedCar(car)
+    setPage("carDetails")
   }
 
   const isMyCar = (car) => {
@@ -79,7 +84,7 @@ const MyCars = ({ user }) => {
       <div className="cars-grid">
         {cars.map((car) => (
           <div className="car-card" key={car._id}>
-            <div className="car-img-box">
+            <div className="car-img-box" onClick={() => openDetails(car)}>
               <img src={getCarImage(car)} alt={car.title} />
             </div>
 
@@ -92,6 +97,8 @@ const MyCars = ({ user }) => {
               <p>Status: {car.status || "Available"}</p>
 
               <div className="post-actions">
+                <button onClick={() => openDetails(car)}>View Details</button>
+
                 <button onClick={() => updateStatus(car._id, "Sold")}>
                   Mark Sold
                 </button>
@@ -114,4 +121,4 @@ const MyCars = ({ user }) => {
   )
 }
 
-export default MyCars
+export default MyCars 

@@ -3,6 +3,7 @@ import "./App.css"
 
 import Navbar from "./components/Navbar"
 import Footer from "./components/Footer"
+import CarDetails from "./components/CarDetails"
 
 import Home from "./pages/Home"
 import BrandCars from "./pages/BrandCars"
@@ -16,10 +17,12 @@ import Register from "./pages/Register"
 function App() {
   const [page, setPage] = useState("home")
   const [selectedBrand, setSelectedBrand] = useState("")
+  const [selectedCar, setSelectedCar] = useState(null)
   const [user, setUser] = useState(null)
 
   useEffect(() => {
     const savedUser = localStorage.getItem("carooUser")
+
     if (savedUser) {
       setUser(JSON.parse(savedUser))
     }
@@ -30,10 +33,16 @@ function App() {
     setPage("brand")
   }
 
+  const openCarDetails = (car) => {
+    setSelectedCar(car)
+    setPage("carDetails")
+  }
+
   const logout = () => {
     localStorage.removeItem("carooUser")
     localStorage.removeItem("carooToken")
     setUser(null)
+    setSelectedCar(null)
     setPage("home")
   }
 
@@ -45,20 +54,65 @@ function App() {
         <Home
           setPage={setPage}
           openBrandPage={openBrandPage}
+          openCarDetails={openCarDetails}
+          setSelectedCar={setSelectedCar}
           user={user}
         />
       )}
 
       {page === "brand" && (
-        <BrandCars brand={selectedBrand} setPage={setPage} />
+        <BrandCars
+          brand={selectedBrand}
+          setPage={setPage}
+          openCarDetails={openCarDetails}
+          setSelectedCar={setSelectedCar}
+        />
       )}
 
-      {page === "addCar" && <AddCar setPage={setPage} user={user} />}
-      {page === "allCars" && <AllCars />}
-      {page === "favorites" && <Favorites />}
-      {page === "myCars" && <MyCars user={user} />}
-      {page === "login" && <Login setPage={setPage} setUser={setUser} />}
-      {page === "register" && <Register setPage={setPage} setUser={setUser} />}
+      {page === "addCar" && (
+        <AddCar setPage={setPage} user={user} />
+      )}
+
+      {page === "allCars" && (
+        <AllCars
+          setPage={setPage}
+          openCarDetails={openCarDetails}
+          setSelectedCar={setSelectedCar}
+        />
+      )}
+
+      {page === "favorites" && (
+        <Favorites
+          setPage={setPage}
+          openCarDetails={openCarDetails}
+          setSelectedCar={setSelectedCar}
+        />
+      )}
+
+      {page === "myCars" && (
+        <MyCars
+          user={user}
+          setPage={setPage}
+          openCarDetails={openCarDetails}
+          setSelectedCar={setSelectedCar}
+        />
+      )}
+
+      {page === "carDetails" && selectedCar && (
+        <CarDetails
+          car={selectedCar}
+          user={user}
+          setPage={setPage}
+        />
+      )}
+
+      {page === "login" && (
+        <Login setPage={setPage} setUser={setUser} />
+      )}
+
+      {page === "register" && (
+        <Register setPage={setPage} setUser={setUser} />
+      )}
 
       <Footer />
     </div>

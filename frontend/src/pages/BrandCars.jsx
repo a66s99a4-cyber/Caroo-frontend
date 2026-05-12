@@ -4,7 +4,7 @@ import CarCard from "../components/CarCard"
 
 const categories = ["SUV", "Sedan", "Sport", "Pickup", "Luxury", "Electric"]
 
-const BrandCars = ({ brand, setPage }) => {
+const BrandCars = ({ brand, setPage, setSelectedCar }) => {
   const [cars, setCars] = useState([])
   const [selectedCategory, setSelectedCategory] = useState("All")
 
@@ -57,7 +57,12 @@ const BrandCars = ({ brand, setPage }) => {
       <div className="cars-grid">
         {filteredCars.length > 0 ? (
           filteredCars.map((car) => (
-            <CarCard key={car._id} car={car} />
+            <CarCard
+              key={car._id}
+              car={car}
+              setPage={setPage}
+              setSelectedCar={setSelectedCar}
+            />
           ))
         ) : (
           <p className="empty-text">No cars found for this brand/category.</p>
