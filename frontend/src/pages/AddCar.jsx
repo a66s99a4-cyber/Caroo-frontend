@@ -32,20 +32,15 @@ const AddCar = ({ setPage, user }) => {
     price: "",
     mileage: "",
     description: "",
-    phone: ""
+    phone: "",
+    image: ""
   })
-
-  const [images, setImages] = useState([])
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     })
-  }
-
-  const handleImages = (e) => {
-    setImages(e.target.files)
   }
 
   const handleSubmit = async (e) => {
@@ -58,27 +53,20 @@ const AddCar = ({ setPage, user }) => {
     }
 
     try {
-      const data = new FormData()
-
-      data.append("title", formData.title)
-      data.append("brand", formData.brand)
-      data.append("category", formData.category)
-      data.append("year", formData.year)
-      data.append("price", formData.price)
-      data.append("mileage", formData.mileage)
-      data.append("description", formData.description)
-      data.append("phone", formData.phone)
-      data.append("seller", user._id)
-
-      for (let i = 0; i < images.length; i++) {
-        data.append("images", images[i])
+      const newCar = {
+        title: formData.title,
+        brand: formData.brand,
+        category: formData.category,
+        year: formData.year,
+        price: formData.price,
+        mileage: formData.mileage,
+        description: formData.description,
+        phone: formData.phone,
+        image: formData.image,
+        seller: user._id
       }
 
-      await api.post("/cars", data, {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      })
+      await api.post("/cars", newCar)
 
       alert("Car added successfully")
       setPage("myCars")
@@ -120,9 +108,31 @@ const AddCar = ({ setPage, user }) => {
           ))}
         </select>
 
-        <input type="number" name="year" placeholder="Year" value={formData.year} onChange={handleChange} required />
-        <input type="number" name="price" placeholder="Price BD" value={formData.price} onChange={handleChange} required />
-        <input type="number" name="mileage" placeholder="Mileage" value={formData.mileage} onChange={handleChange} />
+        <input
+          type="number"
+          name="year"
+          placeholder="Year"
+          value={formData.year}
+          onChange={handleChange}
+          required
+        />
+
+        <input
+          type="number"
+          name="price"
+          placeholder="Price BD"
+          value={formData.price}
+          onChange={handleChange}
+          required
+        />
+
+        <input
+          type="number"
+          name="mileage"
+          placeholder="Mileage"
+          value={formData.mileage}
+          onChange={handleChange}
+        />
 
         <input
           type="text"
@@ -134,11 +144,12 @@ const AddCar = ({ setPage, user }) => {
         />
 
         <input
-          type="file"
-          name="images"
-          accept="image/*"
-          multiple
-          onChange={handleImages}
+          type="text"
+          name="image"
+          placeholder="Paste car image URL"
+          value={formData.image}
+          onChange={handleChange}
+          required
         />
 
         <textarea
