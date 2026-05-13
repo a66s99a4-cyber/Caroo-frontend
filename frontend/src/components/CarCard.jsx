@@ -2,12 +2,19 @@ import { API_BASE_URL } from "../api/api"
 
 const CarCard = ({ car, setSelectedCar, setPage }) => {
   const getCarImage = () => {
+    if (car.image && car.image.startsWith("http")) {
+      return car.image
+    }
+
     if (car.images && car.images.length > 0) {
+      if (car.images[0].startsWith("http")) {
+        return car.images[0]
+      }
+
       return `${API_BASE_URL}${car.images[0]}`
     }
 
     if (car.image) {
-      if (car.image.startsWith("http")) return car.image
       return `${API_BASE_URL}${car.image}`
     }
 
@@ -22,7 +29,7 @@ const CarCard = ({ car, setSelectedCar, setPage }) => {
   return (
     <div className="car-card">
       <div className="car-img-box" onClick={openDetails}>
-        <img src={getCarImage()} alt={car.title} />
+        <img src={getCarImage()} alt={car.title || "Car"} />
       </div>
 
       <div className="car-card-content">
